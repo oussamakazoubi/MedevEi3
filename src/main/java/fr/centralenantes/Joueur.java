@@ -153,4 +153,10 @@ public class Joueur {
             }
         }
    
+    }
+    
+    @Override
+    public String toString() {
+        return "Joueur: " + nom + ", Fortune: " + fortune + "€, Position: " + position ;
+    
     }}
