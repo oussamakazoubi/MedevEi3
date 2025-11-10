@@ -11,4 +11,14 @@ package fr.centralenantes;
  */
 public class Joueur {
 
+
+    public Joueur(String nom, Plateau plateau) {
+        this.nom = nom;
+        this.plateau = plateau;
+    }
+    public void getNom() {
+        return nom;
+    }
+    
+
 }
