@@ -47,5 +47,10 @@ public class Joueur {
             throw new NoMoreMoney("Le joueur " + nom + " n'a plus d'argent !");
         }
     }
-        
+    
+    public void payer (Joueur j, int montant) throws NoMoreMoney {
+        this.debiter(montant);
+        j.crediter(montant);
+    }
+    
     }
