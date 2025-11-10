@@ -1,3 +1,4 @@
+package fr.centralenantes;
 /**
  * Représente une case constructible du plateau (type rue/terrain) qu’un joueur peut acheter et sur laquelle
  * il est possible de construire des maisons et des hôtels. Le loyer dû par un visiteur dépend du
