@@ -133,7 +133,7 @@ public class Joueur {
         this.setPosition(new_position);
         Case current_case = this.plateau.caseAt(new_position);
         System.out.println("Le joueur " + nom + " est en  " + position + " : " + current_case.getNom());
-        if (this.plateau.caseAt(new_position) instanceof Achetable) {
+        if (current_case instanceof Achetable) {
 
             Achetable prop = (Achetable) this.plateau.caseAt(new_position);
 
