@@ -52,7 +52,7 @@ public class Joueur {
         this.debiter(montant);
         j.crediter(montant);
     }
-     public int nbGaresPossedees() {
+    public int nbGaresPossedees() {
         int count = 0;
         for (Case p : plateau.getCases()) {
             if (p instanceof Gare && p.getCases() == this) {
@@ -60,5 +60,39 @@ public class Joueur {
             }
         }
         return count;}
+
+    public static int lanceLeDe() {
+        return ((int) Math.floor(Math.random()*6))+1;
+}
+
+    public void tourDeJeu() {
+
+        int de=lanceLeDe();
+        System.out.println(nom + " a lancé le dé : " + de);
+
+        int new_position = this.Plateau.avance(position, de);
+        this.setPosition(new_position);
+        System.out.println("Le joueur " + nom + " est en  " + position + " : " + caseAt(new_position).getNom());
+        if (caseAt(new_position) instanceof Achetable) {
+
+            Achetable prop = (Achetable) caseAt(new_position);
+
+            if ((de % 2 != 0) && (prop.estLibre()))  {
+
+                if ((this.getFortune()>= prop.getPrix())){
+
+                    prop.acheter(this);
+                    System.out.println(nom + " a acheté la propriété " + prop.getNom() + " pour " + prop.getPrix() + "€.");
+                }else{
+                    System.out.println(nom + " n'a pas assez d'argent pour acheter " + prop.getNom() + ".");
+                }
+
+            }else{
+                System.out.println("la case est déjà acquise par " + prop.getNom() + ". Veuillez payer le loyer.");
+                int loyer = prop.calculerLoyer(this.plateau, this);
+                this.payer(prop.getProprietaire(), loyer);
+                System.out.println(nom + " a payé un loyer de " + loyer + "€ à " + prop.getProprietaire().getNom() + ".");
+            }
+        }
    
-    }
+    }}
