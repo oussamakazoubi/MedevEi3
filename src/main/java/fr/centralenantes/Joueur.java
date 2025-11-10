@@ -136,18 +136,24 @@ public class Joueur {
 
             Achetable prop = (Achetable) (plateau.caseAt(new_position));
 
-            if ((de % 2 != 0) && (prop.estLibre()))  {
-
-                if ((this.getFortune()>= prop.getPrix())){
+            if ((prop.estLibre()))  {
+                
+                if(de % 2 != 0)
+                {
+                    if ((this.getFortune()>= prop.getPrix())){
 
                     prop.acheter(this);
                     System.out.println(nom + " a acheté la propriété " + prop.getNom() + " pour " + prop.getPrix() + "€.");
-                }else{
-                    System.out.println(nom + " n'a pas assez d'argent pour acheter " + prop.getNom() + ".");
+                    }else{
+                        System.out.println(nom + " n'a pas assez d'argent pour acheter " + prop.getNom() + ".");
+                    }
+                } else{
+                    System.out.println(nom + " a choisit de ne pas acheter " + prop.getNom() + ".");
                 }
 
+
             }else{
-                System.out.println("la case est déjà acquise par " + prop.getNom() + ". Veuillez payer le loyer.");
+                System.out.println("la case est déjà acquise par " + prop.getProprietaire().getNom() + ". Veuillez payer le loyer.");
                 int loyer = prop.calculLoyer(this.plateau, this);
                 this.payer(prop.getProprietaire(), loyer);
                 System.out.println(nom + " a payé un loyer de " + loyer + "€ à " + prop.getProprietaire().getNom() + ".");
