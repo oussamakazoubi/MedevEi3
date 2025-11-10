@@ -22,9 +22,18 @@ public class Joueur {
         this.nom = nom;
         this.plateau = plateau;
     }
-    public void getNom() {
+    public String getNom() {
         return nom;
     }
     
-
+    public void crediter(int montant) {
+        fortune += montant;
 }
+
+    public void debiter(int montant) throws NoMoreMoney {
+        fortune -= montant;
+    }
+    
+    public 
+    
+    }
