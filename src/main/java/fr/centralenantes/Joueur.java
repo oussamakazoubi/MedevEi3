@@ -29,6 +29,7 @@ public class Joueur {
     public Joueur(String nom, Plateau plateau) {
         this.nom = nom;
         this.plateau = plateau;
+        this.fortune = 100000; // fortune initiale
     }
     /**
      * @return Le nom du joueur.
