@@ -43,11 +43,22 @@ public class Joueur {
 
     public void debiter(int montant) throws NoMoreMoney {
         fortune -= montant;
+        if (fortune < 0) {
+            throw new NoMoreMoney("Le joueur " + nom + " n'a plus d'argent !");
+        }
     }
     
     public void payer (Joueur j, int montant) throws NoMoreMoney {
         this.debiter(montant);
         j.crediter(montant);
     }
-    
+     public int nbGaresPossedees() {
+        int count = 0;
+        for (Case p : plateau.getCases()) {
+            if (p instanceof Gare && p.getCases() == this) {
+                count++;
+            }
+        }
+        return count;}
+   
     }
