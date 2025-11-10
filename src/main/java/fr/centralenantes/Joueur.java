@@ -45,6 +45,9 @@ public class Joueur {
         fortune -= montant;
     }
     
-    public 
+    public void payer (Joueur j, int montant) throws NoMoreMoney {
+        this.debiter(montant);
+        j.crediter(montant);
+    }
     
     }
