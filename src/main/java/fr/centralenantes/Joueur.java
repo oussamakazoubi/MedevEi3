@@ -32,7 +32,7 @@ public class Joueur {
         return position;}
     public void setPosition(int position) {
         this.position = position;}
-        
+
     public Plateau getPlateau() {
         return plateau;
     }
@@ -43,8 +43,9 @@ public class Joueur {
 
     public void debiter(int montant) throws NoMoreMoney {
         fortune -= montant;
+        if (fortune < 0) {
+            throw new NoMoreMoney("Le joueur " + nom + " n'a plus d'argent !");
+        }
     }
-    
-    public 
-    
+        
     }
