@@ -32,7 +32,7 @@ public class Joueur {
         return position;}
     public void setPosition(int position) {
         this.position = position;}
-
+        
     public Plateau getPlateau() {
         return plateau;
     }
@@ -52,5 +52,13 @@ public class Joueur {
         this.debiter(montant);
         j.crediter(montant);
     }
-    
+     public int nbGaresPossedees() {
+        int count = 0;
+        for (Case p : plateau.getCases()) {
+            if (p instanceof Gare && p.getCases() == this) {
+                count++;
+            }
+        }
+        return count;}
+   
     }
