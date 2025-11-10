@@ -168,7 +168,7 @@ public class Main extends JFrame {
             nom.setFont(new Font("Arial", Font.BOLD, 14));
             nom.setAlignmentX(Component.CENTER_ALIGNMENT);
             
-            JLabel fortune = new JLabel("Fortune : " + j.getFortune() + " €");
+            JLabel fortune = new JLabel("Fortune : " + j.getFortune() + " eur");
             fortune.setFont(new Font("Arial", Font.PLAIN, 12));
             fortune.setAlignmentX(Component.CENTER_ALIGNMENT);
             
