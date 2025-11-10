@@ -1,3 +1,5 @@
+package fr.centralenantes;
+
 /**
  * La classe Achetable représente une case du plateau de jeu qui peut être achetée par un joueur.
  * Elle hérite de la classe Case.
@@ -23,14 +25,28 @@ public class Achetable extends Case {
      *
      * @param nom Nom de la case
      * @param prix Prix d'achat de la case
-     * @param proprietaire Joueur propriétaire initial (null si libre)
+     * @param proprietaire Joueur propriétaire
      */
     public Achetable(String nom, int prix, Joueur proprietaire) {
         super(nom);
         this.prix = prix;
+        this.proprietaire = proprietaire;
+    }
+    
+        /**
+     * Crée une case achetable avec un nom, un prix et un propriétaire initial.
+     * Par défaut, le propriétaire est null (case libre).
+     *
+     * @param nom Nom de la case
+     * @param prix Prix d'achat de la case
+     * @param proprietaire Joueur propriétaire initial (null si libre)
+     */
+    public Achetable(String nom, int prix) {
+        super(nom);
+        this.prix = prix;
         this.proprietaire = null;
     }
-
+    
     // --- Getters ---
 
     /**
@@ -113,7 +129,7 @@ public class Achetable extends Case {
         if (estLibre() || proprietaire == visiteur) {
             return 0;
         }
-        return 0;
+        return this.prix;
     }
 
     // --- Représentation textuelle ---

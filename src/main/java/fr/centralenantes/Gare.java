@@ -34,7 +34,7 @@ public class Gare extends Achetable {
      */
     public int calculLoyer(Plateau plateau, Joueur visiteur) {
         if (proprietaire == null || proprietaire == visiteur) {
-            return -1; // Cas d'erreur
+            return 0; // Cas d'erreur
         }
         int nbGares = plateau.nbGares(proprietaire);
         return LOYER_PAR_GARE * nbGares;

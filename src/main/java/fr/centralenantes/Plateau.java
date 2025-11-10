@@ -224,7 +224,7 @@ public class Plateau {
      * Fait jouer tous les joueurs jusqu'a la fin de la partie.
      * Supprime les joueurs elimines en cours de route.
      */
-    public void tourDeJeuComplet() {
+    public void tourDeJeuComplet()  {
         System.out.println("Debut de la partie");
         while (!findePartie()) {
             LinkedList<Joueur> elimines = new LinkedList<>();

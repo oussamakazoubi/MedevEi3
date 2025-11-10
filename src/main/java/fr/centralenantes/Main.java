@@ -15,9 +15,10 @@ public class Main extends JFrame {
     private JLabel lblJoueurActuel;
     private JPanel panelJoueurs;
     private int joueurActuelIndex = 0;
+    private Joueur joueurHumain; // Le joueur contrôlé par l'utilisateur
     
     public Main() {
-        setTitle("Monopoly Simplifié - TP1 MEDEV");
+        setTitle("Monopoly Simplifié - TP1 MEDEV (Mode Interactif)");
         setSize(1200, 800);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout(10, 10));
@@ -26,10 +27,24 @@ public class Main extends JFrame {
         plateau = new Plateau();
         plateau.initPlateau();
         
+        // Demander le nom du joueur humain
+        String nomJoueur = JOptionPane.showInputDialog(
+            this,
+            "Entrez votre nom de joueur :",
+            "Bienvenue au Monopoly !",
+            JOptionPane.QUESTION_MESSAGE
+        );
+        
+        if (nomJoueur == null || nomJoueur.trim().isEmpty()) {
+            nomJoueur = "Vous";
+        }
+        
         // Ajout de joueurs par défaut
         plateau.getJoueurs().add(new Joueur("Alice", plateau));
         plateau.getJoueurs().add(new Joueur("Bob", plateau));
         plateau.getJoueurs().add(new Joueur("Charlie", plateau));
+        joueurHumain = new Joueur(nomJoueur, plateau);
+        plateau.getJoueurs().add(joueurHumain);
         
         // Panel principal avec le plateau
         JPanel mainPanel = createPlateauPanel();
@@ -46,6 +61,10 @@ public class Main extends JFrame {
         // Panel du haut avec les joueurs
         JPanel topPanel = createJoueursPanel();
         add(topPanel, BorderLayout.NORTH);
+        
+        log("🎮 Bienvenue " + joueurHumain.getNom() + " !");
+        log("Vous jouez avec Alice, Bob et Charlie.");
+        log("Lorsque c'est votre tour, vous pourrez choisir d'acheter ou non les propriétés.\n");
         
         updateDisplay();
         setVisible(true);
@@ -124,7 +143,7 @@ public class Main extends JFrame {
         JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 10));
         panel.setBorder(BorderFactory.createEtchedBorder());
         
-        lblJoueurActuel = new JLabel("Tour de : Alice");
+        lblJoueurActuel = new JLabel("Tour de : " + plateau.getJoueurs().get(0).getNom());
         lblJoueurActuel.setFont(new Font("Arial", Font.BOLD, 14));
         lblJoueurActuel.setForeground(new Color(0, 0, 150));
         
@@ -162,13 +181,19 @@ public class Main extends JFrame {
             JPanel joueurCard = new JPanel();
             joueurCard.setLayout(new BoxLayout(joueurCard, BoxLayout.Y_AXIS));
             joueurCard.setBorder(BorderFactory.createLineBorder(Color.GRAY, 2));
-            joueurCard.setBackground(Color.WHITE);
             
-            JLabel nom = new JLabel(j.getNom());
+            // Mettre en surbrillance le joueur humain
+            if (j == joueurHumain) {
+                joueurCard.setBackground(new Color(173, 216, 230)); // Bleu clair
+            } else {
+                joueurCard.setBackground(Color.WHITE);
+            }
+            
+            JLabel nom = new JLabel(j.getNom() + (j == joueurHumain ? " (VOUS)" : ""));
             nom.setFont(new Font("Arial", Font.BOLD, 14));
             nom.setAlignmentX(Component.CENTER_ALIGNMENT);
             
-            JLabel fortune = new JLabel("Fortune : " + j.getFortune() + " eur");
+            JLabel fortune = new JLabel("Fortune : " + j.getFortune() + " €");
             fortune.setFont(new Font("Arial", Font.PLAIN, 12));
             fortune.setAlignmentX(Component.CENTER_ALIGNMENT);
             
@@ -213,17 +238,26 @@ public class Main extends JFrame {
         log("═══════════════════════════════════");
         
         try {
-            int posAvant = joueur.getPosition();
-            joueur.tourDeJeu();
-            int posApres = joueur.getPosition();
-            
-            Case caseActuelle = plateau.caseAt(posApres);
-            log("📍 Position : " + posAvant + " → " + posApres);
-            log("📌 Case : " + caseActuelle.getNom());
+            if (joueur == joueurHumain) {
+                // Tour interactif pour le joueur humain
+                executerTourInteractif(joueur);
+            } else {
+                // Tour automatique pour l'IA
+                executerTourIA(joueur);
+            }
             
         } catch (NoMoreMoney e) {
             log("❌ " + joueur.getNom() + " est éliminé : " + e.getMessage());
             plateau.getJoueurs().remove(joueur);
+            
+            if (joueur == joueurHumain) {
+                JOptionPane.showMessageDialog(
+                    this,
+                    "Vous êtes ruiné ! Vous avez perdu la partie.",
+                    "Game Over",
+                    JOptionPane.ERROR_MESSAGE
+                );
+            }
             
             if (joueurActuelIndex >= plateau.getJoueurs().size() && !plateau.getJoueurs().isEmpty()) {
                 joueurActuelIndex = 0;
@@ -237,6 +271,77 @@ public class Main extends JFrame {
         if (plateau.findePartie()) {
             afficherFinPartie();
         }
+    }
+    
+    private void executerTourInteractif(Joueur joueur) throws NoMoreMoney {
+        int de = Joueur.lanceLeDe();
+        log("🎲 Vous avez lancé le dé : " + de);
+        
+        int posAvant = joueur.getPosition();
+        int posApres = plateau.avance(posAvant, de);
+        joueur.setPosition(posApres);
+        
+        Case caseActuelle = plateau.caseAt(posApres);
+        log("📍 Position : " + posAvant + " → " + posApres);
+        log("📌 Case : " + caseActuelle.getNom());
+        
+        if (caseActuelle instanceof Achetable) {
+            Achetable prop = (Achetable) caseActuelle;
+            
+            if (de % 2 != 0 && prop.estLibre()) {
+                // Proposer l'achat
+                if (joueur.getFortune() >= prop.getPrix()) {
+                    int choix = JOptionPane.showConfirmDialog(
+                        this,
+                        "La propriété " + prop.getNom() + " est disponible !\n" +
+                        "Prix : " + prop.getPrix() + " €\n" +
+                        "Votre fortune : " + joueur.getFortune() + " €\n\n" +
+                        "Voulez-vous l'acheter ?",
+                        "Opportunité d'achat",
+                        JOptionPane.YES_NO_OPTION,
+                        JOptionPane.QUESTION_MESSAGE
+                    );
+                    
+                    if (choix == JOptionPane.YES_OPTION) {
+                        prop.acheter(joueur);
+                        log("✅ Vous avez acheté " + prop.getNom() + " pour " + prop.getPrix() + " €");
+                    } else {
+                        log("⏭️ Vous avez refusé d'acheter " + prop.getNom());
+                    }
+                } else {
+                    log("❌ Vous n'avez pas assez d'argent pour acheter " + prop.getNom() + " (" + prop.getPrix() + " €)");
+                }
+            } else if (!prop.estLibre() && prop.getProprietaire() != joueur) {
+                // Payer le loyer
+                int loyer = prop.calculLoyer(plateau, joueur);
+                log("💸 Vous devez payer un loyer de " + loyer + " € à " + prop.getProprietaire().getNom());
+                
+                JOptionPane.showMessageDialog(
+                    this,
+                    "Vous êtes sur la propriété de " + prop.getProprietaire().getNom() + " !\n" +
+                    "Loyer à payer : " + loyer + " €",
+                    "Paiement de loyer",
+                    JOptionPane.INFORMATION_MESSAGE
+                );
+                
+                joueur.payer(prop.getProprietaire(), loyer);
+                log("✔️ Loyer payé : " + loyer + " € à " + prop.getProprietaire().getNom());
+            } else if (prop.getProprietaire() == joueur) {
+                log("🏠 Cette propriété vous appartient déjà !");
+            }
+        }
+        
+        updateDisplay();
+    }
+    
+    private void executerTourIA(Joueur joueur) throws NoMoreMoney {
+        int posAvant = joueur.getPosition();
+        joueur.tourDeJeu();
+        int posApres = joueur.getPosition();
+        
+        Case caseActuelle = plateau.caseAt(posApres);
+        log("📍 Position : " + posAvant + " → " + posApres);
+        log("📌 Case : " + caseActuelle.getNom());
     }
     
     private void executerTourComplet() {
@@ -253,7 +358,7 @@ public class Main extends JFrame {
         for (int i = 0; i < nbJoueurs && !plateau.findePartie(); i++) {
             executerTourJoueur();
             try {
-                Thread.sleep(300); // Petite pause pour suivre l'action
+                Thread.sleep(500); // Petite pause pour suivre l'action
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -264,24 +369,45 @@ public class Main extends JFrame {
         plateau = new Plateau();
         plateau.initPlateau();
         
-        String[] noms = {"Alice", "Bob", "Charlie", "Diana"};
-        int nbJoueurs = Integer.parseInt(JOptionPane.showInputDialog(
-            this, 
-            "Nombre de joueurs (2-4) :", 
-            "Nouvelle partie", 
+        // Demander le nom du joueur humain
+        String nomJoueur = JOptionPane.showInputDialog(
+            this,
+            "Entrez votre nom de joueur :",
+            "Nouvelle partie",
             JOptionPane.QUESTION_MESSAGE
-        ));
+        );
         
-        nbJoueurs = Math.max(2, Math.min(4, nbJoueurs));
+        if (nomJoueur == null || nomJoueur.trim().isEmpty()) {
+            nomJoueur = "Vous";
+        }
         
-        for (int i = 0; i < nbJoueurs; i++) {
+        // Demander le nombre de joueurs IA
+        String[] options = {"1", "2", "3"};
+        String choix = (String) JOptionPane.showInputDialog(
+            this,
+            "Nombre de joueurs IA :",
+            "Nouvelle partie",
+            JOptionPane.QUESTION_MESSAGE,
+            null,
+            options,
+            "2"
+        );
+        
+        int nbIA = choix != null ? Integer.parseInt(choix) : 2;
+        
+        String[] noms = {"Alice", "Bob", "Charlie"};
+        for (int i = 0; i < nbIA; i++) {
             plateau.getJoueurs().add(new Joueur(noms[i], plateau));
         }
         
+        joueurHumain = new Joueur(nomJoueur, plateau);
+        plateau.getJoueurs().add(joueurHumain);
+        
         joueurActuelIndex = 0;
         logArea.setText("");
-        log("🎮 Nouvelle partie démarrée avec " + nbJoueurs + " joueurs !");
-        log("Bonne chance à tous !\n");
+        log("🎮 Nouvelle partie démarrée avec " + (nbIA + 1) + " joueurs !");
+        log("Vous jouez contre " + nbIA + " adversaire(s) IA.");
+        log("Bonne chance " + joueurHumain.getNom() + " !\n");
         
         updateDisplay();
     }
@@ -296,10 +422,19 @@ public class Main extends JFrame {
             log("\n🏆 VAINQUEUR : " + gagnant.getNom());
             log("💰 Fortune finale : " + gagnant.getFortune() + " €");
             
+            String message;
+            if (gagnant == joueurHumain) {
+                message = "🎉 FÉLICITATIONS ! VOUS AVEZ GAGNÉ ! 🎉\n" +
+                         "Fortune finale : " + gagnant.getFortune() + " €";
+            } else {
+                message = "😢 " + gagnant.getNom() + " remporte la partie.\n" +
+                         "Fortune finale : " + gagnant.getFortune() + " €\n\n" +
+                         "Meilleure chance la prochaine fois !";
+            }
+            
             JOptionPane.showMessageDialog(
                 this,
-                "🏆 " + gagnant.getNom() + " remporte la partie !\n" +
-                "Fortune finale : " + gagnant.getFortune() + " €",
+                message,
                 "Fin de partie",
                 JOptionPane.INFORMATION_MESSAGE
             );
@@ -321,7 +456,7 @@ public class Main extends JFrame {
         // Mise à jour du label joueur actuel
         if (!plateau.getJoueurs().isEmpty()) {
             Joueur joueur = plateau.getJoueurs().get(joueurActuelIndex % plateau.getJoueurs().size());
-            lblJoueurActuel.setText("Tour de : " + joueur.getNom());
+            lblJoueurActuel.setText("Tour de : " + joueur.getNom() + (joueur == joueurHumain ? " (VOUS)" : ""));
         }
         
         // Activer/désactiver les boutons
@@ -344,9 +479,9 @@ public class Main extends JFrame {
             // Symbole selon le type de case
             if (c instanceof CaseSpeciale) {
                 CaseSpeciale cs = (CaseSpeciale) c;
-                if (cs.getType().equals("DEPART")) {
+                if (cs.getType().equals("DEPART") || cs.getType().equals("Depart")) {
                     sb.append("[D] ");
-                } else if (cs.getType().equals("PRISON")) {
+                } else if (cs.getType().equals("PRISON") || cs.getType().equals("Prison")) {
                     sb.append("[P] ");
                 } else {
                     sb.append("[C] ");

@@ -246,9 +246,12 @@ public class TestMedevEi3 {
         }
         
         // Test 8 : findePartie() - début de partie
+        
         try {
             Plateau p = new Plateau();
             p.initPlateau();
+            p.getJoueurs().add(new Joueur("Alice", p));
+            p.getJoueurs().add(new Joueur("Bob", p));
             verifier("Plateau - findePartie() début", !p.findePartie());
         } catch (Exception e) {
             verifier("Plateau - findePartie() début", false);
