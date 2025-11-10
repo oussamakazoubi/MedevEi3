@@ -25,7 +25,18 @@ public class Joueur {
     public String getNom() {
         return nom;
     }
-    
+    public int getFortune() {
+        return fortune;
+        }
+    public int getPosition() {
+        return position;}
+    public void setPosition(int position) {
+        this.position = position;}
+        
+    public Plateau getPlateau() {
+        return plateau;
+    }
+
     public void crediter(int montant) {
         fortune += montant;
 }
