@@ -22,9 +22,19 @@ public class Joueur {
         this.nom = nom;
         this.plateau = plateau;
     }
-    public void getNom() {
+    public String getNom() {
         return nom;
     }
-    
+    public int getFortune() {
+        return fortune;
+        }
+    public int getPosition() {
+        return position;}
+    public void setPosition(int position) {
+        this.position = position;}
+    public Plateau getPlateau() {
+        return plateau;
+    }
+
 
 }
