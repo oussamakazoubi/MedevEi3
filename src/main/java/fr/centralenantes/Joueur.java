@@ -104,7 +104,7 @@ public class Joueur {
     public int nbGaresPossedees() {
         int count = 0;
         for (Case p : plateau.getCases()) {
-            if (p instanceof Gare && p.getCases() == this) {
+            if (p instanceof Gare && ((Achetable)p).getProprietaire() == this) {
                 count++;
             }
         }
@@ -124,17 +124,17 @@ public class Joueur {
      * 3. Effectue une action (acheter ou payer) selon la case d'arrivée.
      */
 
-    public void tourDeJeu() {
+    public void tourDeJeu() throws NoMoreMoney {
 
         int de=lanceLeDe();
         System.out.println(nom + " a lancé le dé : " + de);
 
-        int new_position = this.Plateau.avance(position, de);
+        int new_position = this.plateau.avance(position, de);
         this.setPosition(new_position);
-        System.out.println("Le joueur " + nom + " est en  " + position + " : " + caseAt(new_position).getNom());
+        System.out.println("Le joueur " + nom + " est en  " + position + " : " + plateau.caseAt(new_position).getNom());
         if (this.plateau.caseAt(new_position) instanceof Achetable) {
 
-            Achetable prop = (Achetable) caseAt(new_position);
+            Achetable prop = (Achetable) (plateau.caseAt(new_position));
 
             if ((de % 2 != 0) && (prop.estLibre()))  {
 
@@ -148,7 +148,7 @@ public class Joueur {
 
             }else{
                 System.out.println("la case est déjà acquise par " + prop.getNom() + ". Veuillez payer le loyer.");
-                int loyer = prop.calculerLoyer(this.plateau, this);
+                int loyer = prop.calculLoyer(this.plateau, this);
                 this.payer(prop.getProprietaire(), loyer);
                 System.out.println(nom + " a payé un loyer de " + loyer + "€ à " + prop.getProprietaire().getNom() + ".");
             }

@@ -1,3 +1,4 @@
+package fr.centralenantes;
 /**
  * Classe abstraite Case
  * ---------------------

@@ -1,3 +1,5 @@
+package fr.centralenantes;
+
 /**
  * La classe Achetable représente une case du plateau de jeu qui peut être achetée par un joueur.
  * Elle hérite de la classe Case.
@@ -28,9 +30,14 @@ public class Achetable extends Case {
     public Achetable(String nom, int prix, Joueur proprietaire) {
         super(nom);
         this.prix = prix;
-        this.proprietaire = null;
+        this.proprietaire = proprietaire;
     }
 
+    public Achetable(String nom, int prix) {
+        super(nom);
+        this.prix = prix;
+        this.proprietaire = null;
+    }
     // --- Getters ---
 
     /**
