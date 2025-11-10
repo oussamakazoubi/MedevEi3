@@ -103,7 +103,7 @@ public class Joueur {
      */
     public int nbGaresPossedees() {
         int count = 0;
-        for (Case p : plateau.getCases()) {
+        for (Case p : this.plateau.getCases()) {
             if (p instanceof Gare && p.getCases() == this) {
                 count++;
             }
@@ -129,12 +129,12 @@ public class Joueur {
         int de=lanceLeDe();
         System.out.println(nom + " a lancé le dé : " + de);
 
-        int new_position = this.Plateau.avance(position, de);
+        int new_position = this.plateau.avance(position, de);
         this.setPosition(new_position);
-        System.out.println("Le joueur " + nom + " est en  " + position + " : " + caseAt(new_position).getNom());
+        System.out.println("Le joueur " + nom + " est en  " + position + " : " + this.plateau.caseAt(new_position).getNom());
         if (this.plateau.caseAt(new_position) instanceof Achetable) {
 
-            Achetable prop = (Achetable) caseAt(new_position);
+            Achetable prop = (Achetable) this.plateau.caseAt(new_position);
 
             if ((de % 2 != 0) && (prop.estLibre()))  {
 
